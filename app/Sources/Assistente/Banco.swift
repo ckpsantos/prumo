@@ -31,6 +31,7 @@ enum Banco {
             throw NSError(domain: "Banco", code: 1, userInfo: [NSLocalizedDescriptionKey: "Não abriu o banco em \(Caminhos.db)"])
         }
         sqlite3_busy_timeout(db, 5000)
+        sqlite3_exec(db, "PRAGMA journal_mode=WAL", nil, nil, nil)  // leitura nunca espera a rodada que está gravando
         sqlite3_exec(db, "PRAGMA foreign_keys=ON", nil, nil, nil)
         return db
     }
@@ -185,34 +186,55 @@ final class Estado: ObservableObject {
     @Published var paleta = false
     @Published var editando = false   // campo de texto em foco (atalhos de tarefa desligados)
     private var timer: Timer?
+    private let fila = DispatchQueue(label: "prumo.banco", qos: .userInitiated)
+    private var carregando = false
 
     init() {
         recarregar()
         timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in self?.recarregar() }
     }
 
+    /// Lê o banco FORA da linha principal (se a rodada estiver gravando, a tela continua respondendo)
+    /// e só publica o que mudou (sem redesenhar tudo a cada 5 s).
     func recarregar() {
-        do {
-            Cadastro.ambientes = try Banco.consultar("SELECT id, nome, cor, ordem FROM ambientes ORDER BY ordem IS NULL, ordem, id")
-            clientes = try Banco.consultar("SELECT ambiente, id, nome FROM clientes ORDER BY ambiente, coalesce(nome, id)")
-            Cadastro.clientes = clientes
-            itens = try Banco.consultar("""
+        guard !carregando else { return }
+        carregando = true
+        fila.async {
+            let lido = Result { try Self.ler() }
+            let rodada = (try? Data(contentsOf: Caminhos.estadoRodada)).flatMap { try? JSONSerialization.jsonObject(with: $0) } as? [String: Any]
+            DispatchQueue.main.async {
+                self.carregando = false
+                switch lido {
+                case .success(let d):
+                    Cadastro.ambientes = d.ambientes
+                    Cadastro.clientes = d.clientes
+                    if self.clientes != d.clientes { self.clientes = d.clientes }
+                    if self.itens != d.itens { self.itens = d.itens }
+                    if self.agendaHoje != d.agenda { self.agendaHoje = d.agenda }
+                    if self.erro != nil { self.erro = nil }
+                case .failure(let e): self.erro = e.localizedDescription
+                }
+                if (self.rodada as NSDictionary?) != (rodada as NSDictionary?) { self.rodada = rodada }
+            }
+        }
+    }
+
+    private static func ler() throws -> (ambientes: [Linha], clientes: [Linha], itens: [Linha], agenda: [Linha]) {
+        let ambientes = try Banco.consultar("SELECT id, nome, cor, ordem FROM ambientes ORDER BY ordem IS NULL, ordem, id")
+        let clientes = try Banco.consultar("SELECT ambiente, id, nome FROM clientes ORDER BY ambiente, coalesce(nome, id)")
+        let itens = try Banco.consultar("""
                 SELECT i.*, e.origem, (SELECT count(*) FROM comentarios c WHERE c.item_id = i.id) AS n_coment,
                        coalesce((SELECT max(a.quando) FROM auditoria a WHERE a.alvo = 'item:' || i.id AND a.acao = 'mover'),
                                 i.criado_em) AS desde
                 FROM itens i JOIN evidencias e ON e.id = i.evidencia_id
                 ORDER BY (i.prazo IS NULL), i.prazo, i.criado_em DESC
                 """)
-            agendaHoje = try Banco.consultar("""
+        let agenda = try Banco.consultar("""
                 SELECT e.*, b.id AS briefing_id, b.titulo AS briefing_titulo, b.conteudo AS briefing
                 FROM evidencias e LEFT JOIN briefings b ON b.evidencia_id = e.id
                 WHERE e.origem = 'agenda' AND e.removido_em IS NULL AND substr(e.quando, 1, 10) = ? ORDER BY e.quando
                 """, [Dia.hoje])
-            erro = nil
-        } catch { self.erro = error.localizedDescription }
-        if let d = try? Data(contentsOf: Caminhos.estadoRodada) {
-            rodada = (try? JSONSerialization.jsonObject(with: d)) as? [String: Any]
-        } else { rodada = nil }
+        return (ambientes, clientes, itens, agenda)
     }
 
     var rodando: Bool { rodandoLocal || (rodada?["status"] as? String) == "rodando" }

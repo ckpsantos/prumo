@@ -11,6 +11,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 def abrir(caminho, amb=None):
     """amb = dicionário de ambientes (padrão: cadastro/config.json). Nome/cor/ordem são atualizados a cada chamada."""
     con = sqlite3.connect(caminho)
+    if caminho != ":memory:":
+        con.execute("PRAGMA journal_mode=WAL")  # leitores (o app) nunca esperam quem está gravando
     con.execute("PRAGMA foreign_keys = ON")
     con.executescript((RAIZ / "db/schema.sql").read_text())
     if amb is None:

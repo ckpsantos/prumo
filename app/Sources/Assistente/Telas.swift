@@ -392,6 +392,16 @@ struct Detalhe: View {
 
     private var item: Linha { estado.itens.first { $0["id"] == itemId } ?? [:] }
 
+    /// Resumo em texto para o menu Compartilhar (você escolhe para quem; o app não envia nada sozinho).
+    private var textoParaCompartilhar: String {
+        var t = [item["titulo"] ?? "", "\(nomeAmbiente(item["ambiente"])) · \(nomeCliente(item["cliente"], item["ambiente"]))"]
+        if let p = item["prazo"] { t.append("Prazo: \(p)") }
+        if let r = item["responsavel"] { t.append("Responsável: \(r)") }
+        if let d = item["descricao"], !d.isEmpty { t.append("\n\(d)") }
+        if !comentarios.isEmpty { t.append("\nComentários:\n" + comentarios.map { "- \($0["texto"] ?? "")" }.joined(separator: "\n")) }
+        return t.joined(separator: "\n")
+    }
+
     var body: some View {
         let cor = corAmbiente(item["ambiente"])
         VStack(alignment: .leading, spacing: 12) {
@@ -405,6 +415,8 @@ struct Detalhe: View {
                     Text(item["titulo"] ?? "").font(.title3.bold()).textSelection(.enabled)
                 }
                 Spacer()
+                ShareLink(item: textoParaCompartilhar) { Image(systemName: "square.and.arrow.up") }
+                    .botaoVidro().help("Compartilhar a tarefa (Mail, Mensagens, Notas, AirDrop…)")
                 Button { estado.aberto = nil } label: { Image(systemName: "xmark") }
                     .botaoVidro().keyboardShortcut(.cancelAction).help("Fechar (Esc)")
             }

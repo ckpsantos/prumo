@@ -15,7 +15,7 @@ AGORA = dt.datetime.now(TZ)
 PRIMEIRA_JANELA = dt.timedelta(days=3)  # 1ª rodada de cada fonte olha só os últimos 3 dias
 MIDIA = RAIZ / "midia"
 
-con = sqlite3.connect(RAIZ / "db/assistente.db", timeout=30)
+con = sqlite3.connect(RAIZ / "db/assistente.db", timeout=30, isolation_level=None)  # autocommit: não segura o banco por minutos
 con.execute("PRAGMA foreign_keys = ON")
 novos = {}
 
