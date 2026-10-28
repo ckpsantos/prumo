@@ -1,0 +1,80 @@
+--- a/whatsapp-bridge/main.go
++++ b/whatsapp-bridge/main.go
+@@ -10,6 +10,7 @@
+ 	"math/rand"
+ 	"net/http"
+ 	"os"
++	"strconv"
+ 	"os/signal"
+ 	"path/filepath"
+ 	"reflect"
+@@ -72,6 +73,21 @@
+ }
+ 
+ // Database handler for storing message history
++// Segunda instância (outro número): diretório de store e porta vêm do ambiente (default = comportamento original).
++func storeDir() string {
++	if d := os.Getenv("BRIDGE_STORE_DIR"); d != "" {
++		return d
++	}
++	return "store"
++}
++
++func bridgePort() int {
++	if p, err := strconv.Atoi(os.Getenv("BRIDGE_PORT")); err == nil && p > 0 {
++		return p
++	}
++	return 8080
++}
++
+ type MessageStore struct {
+ 	db *sql.DB
+ }
+@@ -79,12 +95,12 @@
+ // Initialize message store
+ func NewMessageStore() (*MessageStore, error) {
+ 	// Create directory for database if it doesn't exist
+-	if err := os.MkdirAll("store", 0755); err != nil {
++	if err := os.MkdirAll(storeDir(), 0755); err != nil {
+ 		return nil, fmt.Errorf("failed to create store directory: %v", err)
+ 	}
+ 
+ 	// Open SQLite database for messages
+-	db, err := sql.Open("sqlite3", "file:store/messages.db?_foreign_keys=on")
++	db, err := sql.Open("sqlite3", "file:"+storeDir()+"/messages.db?_foreign_keys=on")
+ 	if err != nil {
+ 		return nil, fmt.Errorf("failed to open message database: %v", err)
+ 	}
+@@ -606,7 +622,7 @@
+ 	var err error
+ 
+ 	// First, check if we already have this file
+-	chatDir := fmt.Sprintf("store/%s", strings.ReplaceAll(chatJID, ":", "_"))
++	chatDir := fmt.Sprintf("%s/%s", storeDir(), strings.ReplaceAll(chatJID, ":", "_"))
+ 	localPath := ""
+ 
+ 	// Get media info from the database
+@@ -849,12 +865,12 @@
+ 	dbLog := waLog.Stdout("Database", "INFO", true)
+ 
+ 	// Create directory for database if it doesn't exist
+-	if err := os.MkdirAll("store", 0755); err != nil {
++	if err := os.MkdirAll(storeDir(), 0755); err != nil {
+ 		logger.Errorf("Failed to create store directory: %v", err)
+ 		return
+ 	}
+ 
+-	container, err := sqlstore.New(context.Background(), "sqlite3", "file:store/whatsapp.db?_foreign_keys=on", dbLog)
++	container, err := sqlstore.New(context.Background(), "sqlite3", "file:"+storeDir()+"/whatsapp.db?_foreign_keys=on", dbLog)
+ 	if err != nil {
+ 		logger.Errorf("Failed to connect to database: %v", err)
+ 		return
+@@ -966,7 +982,7 @@
+ 	fmt.Println("\n✓ Connected to WhatsApp! Type 'help' for commands.")
+ 
+ 	// Start REST API server
+-	startRESTServer(client, messageStore, 8080)
++	startRESTServer(client, messageStore, bridgePort())
+ 
+ 	// Periodic history sync
+ 	go func() {

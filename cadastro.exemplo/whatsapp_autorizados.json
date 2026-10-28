@@ -1,0 +1,7 @@
+{
+  "_regra": "Só estes grupos são lidos. Tudo o que não está aqui é ignorado. Chave = JID do grupo (termina em @g.us).",
+  "trabalho": {
+    "120363000000000001@g.us": {"cliente": "padaria-aurora", "nome": "Padaria Aurora 🚀 Agência"},
+    "120363000000000002@g.us": {"cliente": "clinica-vida", "nome": "Clínica Vida Plena | Marketing"}
+  }
+}

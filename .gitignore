@@ -1,0 +1,24 @@
+# ===== Dados pessoais: NUNCA versionar =====
+cadastro/
+db/*.db
+db/*.db-*
+db/*.bak*
+db/assistente.db*
+midia/
+estado_rodada.json
+.rodando/
+.mcp.json
+CLAUDE.local.md
+ARQUITETURA.md
+*.plist
+!app/Info.plist
+docs/demo/*.db
+
+# ===== Gerados =====
+__pycache__/
+app/.build/
+app/dist/
+app/icone/AppIcon.iconset/
+app/icone/previa.png
+.DS_Store
+db/migrar_*.py

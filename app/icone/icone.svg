@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#134B5C"/><stop offset="1" stop-color="#061E27"/>
+    </linearGradient>
+    <linearGradient id="brilho" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"/><stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8E9BA3"/><stop offset="0.38" stop-color="#F4F7F9"/>
+      <stop offset="0.55" stop-color="#C9D2D8"/><stop offset="1" stop-color="#6F7C85"/>
+    </linearGradient>
+    <linearGradient id="tampa" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7A8790"/><stop offset="0.4" stop-color="#E6ECEF"/><stop offset="1" stop-color="#5E6A72"/>
+    </linearGradient>
+  </defs>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#fundo)"/>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#brilho)"/>
+  <rect x="102" y="102" width="820" height="820" rx="183" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="4"/>
+  <line x1="512" y1="190" x2="512" y2="392" stroke="#E8EEF1" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="512" cy="190" r="12" fill="#E8EEF1"/>
+  <rect x="472" y="388" width="80" height="34" rx="10" fill="url(#tampa)"/>
+  <path d="M452 430 H572 Q596 430 592 456 L530 720 Q512 768 494 720 L432 456 Q428 430 452 430 Z" fill="url(#metal)"/>
+  <path d="M500 444 L478 450 L522 700 Q512 722 506 700 Z" fill="#FFFFFF" fill-opacity="0.35"/>
+  <circle cx="452" cy="822" r="15" fill="#E5484D"/>
+  <circle cx="512" cy="822" r="15" fill="#F5A524"/>
+  <circle cx="572" cy="822" r="15" fill="#30A46C"/>
+</svg>

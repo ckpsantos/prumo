@@ -1,0 +1,40 @@
+{
+  "usuario": "Seu Nome",
+  "fuso_horas": -3,
+  "ruido_email": ["pinterest.com", "engage.canva.com"],
+  "agenda_espelho": "ocupado|n[ãa]o dispon[ií]vel",
+  "metricas_mcp": {
+    "google-ads": "~/.claude/google-ads-mcp.sh",
+    "google-analytics": "~/.claude/google-analytics-mcp.sh"
+  },
+  "ambientes": {
+    "trabalho": {
+      "nome": "Agência",
+      "cor": "#E5484D",
+      "email": "voce@suaagencia.com.br",
+      "credenciais": "~/.config/prumo/google/trabalho/credentials.json",
+      "google_tokens": "~/.config/prumo/google/trabalho",
+      "tarefas": "banco-local",
+      "email_filtro": "inteiro",
+      "reunioes": true,
+      "briefing": true,
+      "whatsapp_store": "~/.claude/whatsapp-mcp-plus/whatsapp-bridge/store",
+      "clientes": {
+        "padaria-aurora": {"nome": "Padaria Aurora", "busca": ["padaria aurora", "aurora"]},
+        "clinica-vida": {"nome": "Clínica Vida Plena", "busca": ["vida plena"]}
+      }
+    },
+    "pessoal": {
+      "nome": "Pessoal",
+      "cor": "#30A46C",
+      "email": "voce@gmail.com",
+      "credenciais": "~/.config/prumo/google/pessoal/credentials.json",
+      "google_tokens": "~/.config/prumo/google/pessoal",
+      "tarefas": "banco-local",
+      "email_filtro": "principal",
+      "reunioes": false,
+      "briefing": false,
+      "clientes": {"pessoal": {"nome": "Pessoal", "busca": []}}
+    }
+  }
+}
