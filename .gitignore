@@ -22,4 +22,4 @@ app/icone/AppIcon.iconset/
 app/icone/previa.png
 .DS_Store
 db/migrar_*.py
-guia-v4/
+guia-*/
