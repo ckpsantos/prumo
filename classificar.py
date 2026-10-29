@@ -29,7 +29,7 @@ def chamar_claude(prompt):
     vazio = RAIZ / "midia/.mcp-vazio.json"
     vazio.parent.mkdir(exist_ok=True)
     vazio.write_text('{"mcpServers":{}}')
-    r = subprocess.run(["claude", "-p", "--mcp-config", str(vazio), "--strict-mcp-config", "--allowedTools", ""],
+    r = subprocess.run(["claude", "-p", "--no-session-persistence", "--mcp-config", str(vazio), "--strict-mcp-config", "--allowedTools", ""],
                        input=prompt, capture_output=True, text=True, timeout=900)
     m = re.search(r"\{.*\}", r.stdout, re.S)
     if r.returncode or not m:

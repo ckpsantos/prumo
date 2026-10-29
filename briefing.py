@@ -57,7 +57,7 @@ def gerar(amb, ev_id, titulo, inicio, cli):
     cfg.parent.mkdir(exist_ok=True)
     cfg.write_text(json.dumps(MCP))
     permitidas = [f for n in MCP["mcpServers"] for f in FERRAMENTAS.get(n, [])] or [""]  # só consultas
-    r = subprocess.run(["claude", "-p", "--mcp-config", str(cfg), "--strict-mcp-config", "--allowedTools", *permitidas],
+    r = subprocess.run(["claude", "-p", "--no-session-persistence", "--mcp-config", str(cfg), "--strict-mcp-config", "--allowedTools", *permitidas],
                        input=prompt, capture_output=True, text=True, timeout=900)
     texto = r.stdout.strip()
     if r.returncode or not texto.startswith("#"):
